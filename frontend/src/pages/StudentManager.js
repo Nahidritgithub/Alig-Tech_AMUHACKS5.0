@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { API } from "../config/api";
 
 export default function StudentManager() {
-
   const emptyForm = {
     roll_no: "",
     name: "",
@@ -15,13 +14,16 @@ export default function StudentManager() {
     communication_score: "",
     internships: "",
     projects: "",
-    skills: ""
+    skills: "",
   };
 
   const [students, setStudents] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
   const [deptFilter, setDeptFilter] = useState("");
+
+  // ⭐ scroll ref
+  const formRef = useRef(null);
 
   // ================= STYLES =================
   const styles = {
@@ -31,13 +33,12 @@ export default function StudentManager() {
       minHeight: "100vh",
       color: "#e2e8f0",
       fontFamily: "'Poppins', sans-serif",
-  
     },
     heading: {
       fontSize: "28px",
       fontWeight: "700",
       marginBottom: 20,
-      color: "#ffffff"
+      color: "#ffffff",
     },
     formBox: {
       border: "1px solid #334155",
@@ -45,8 +46,6 @@ export default function StudentManager() {
       marginBottom: 25,
       borderRadius: 10,
       background: "#1e293b",
-      itemAlign: "center",
-   
     },
     input: {
       width: "100%",
@@ -55,7 +54,7 @@ export default function StudentManager() {
       borderRadius: 6,
       border: "1px solid #334155",
       background: "#0f172a",
-      color: "#e2e8f0"
+      color: "#e2e8f0",
     },
     select: {
       width: "100%",
@@ -64,7 +63,7 @@ export default function StudentManager() {
       borderRadius: 6,
       border: "1px solid #334155",
       background: "#0f172a",
-      color: "#e2e8f0"
+      color: "#e2e8f0",
     },
     buttonPrimary: {
       padding: "8px 16px",
@@ -73,7 +72,7 @@ export default function StudentManager() {
       border: "none",
       borderRadius: 6,
       cursor: "pointer",
-      fontWeight: "500"
+      fontWeight: "500",
     },
     buttonDanger: {
       padding: "6px 12px",
@@ -82,7 +81,7 @@ export default function StudentManager() {
       border: "none",
       borderRadius: 6,
       cursor: "pointer",
-      marginLeft: 6
+      marginLeft: 6,
     },
     buttonEdit: {
       padding: "6px 12px",
@@ -90,7 +89,7 @@ export default function StudentManager() {
       color: "#fff",
       border: "none",
       borderRadius: 6,
-      cursor: "pointer"
+      cursor: "pointer",
     },
     buttonView: {
       padding: "6px 12px",
@@ -99,25 +98,24 @@ export default function StudentManager() {
       border: "none",
       borderRadius: 6,
       cursor: "pointer",
-      marginLeft: 6
+      marginLeft: 6,
     },
     card: {
       border: "1px solid #334155",
       padding: 15,
       borderRadius: 10,
-      background: "#1e293b"
+      background: "#1e293b",
     },
     grid: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-      gap: 15
-    }
+      gap: 15,
+    },
   };
 
   // ================= LOAD =================
   const load = () => {
-    axios.get(`${API}/students`)
-      .then(res => setStudents(res.data));
+    axios.get(`${API}/students`).then((res) => setStudents(res.data));
   };
 
   useEffect(() => {
@@ -126,7 +124,6 @@ export default function StudentManager() {
 
   // ================= ADD / UPDATE =================
   const submit = () => {
-
     const payload = {
       roll_no: form.roll_no,
       name: form.name,
@@ -137,24 +134,25 @@ export default function StudentManager() {
       communication_score: Number(form.communication_score),
       internships: Number(form.internships),
       projects: Number(form.projects),
-      skills: form.skills.split(",").map(s => s.trim())
+      skills: form.skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
     };
 
     if (editId) {
-      axios.put(`${API}/students/${editId}`, payload)
-        .then(() => {
-          alert("Updated");
-          setEditId(null);
-          setForm(emptyForm);
-          load();
-        });
+      axios.put(`${API}/students/${editId}`, payload).then(() => {
+        alert("Updated");
+        setEditId(null);
+        setForm(emptyForm);
+        load();
+      });
     } else {
-      axios.post(`${API}/students`, payload)
-        .then(() => {
-          alert("Added");
-          setForm(emptyForm);
-          load();
-        });
+      axios.post(`${API}/students`, payload).then(() => {
+        alert("Added");
+        setForm(emptyForm);
+        load();
+      });
     }
   };
 
@@ -171,21 +169,25 @@ export default function StudentManager() {
       communication_score: s.communication_score,
       internships: s.internships,
       projects: s.projects,
-      skills: s.skills.join(", ")
+      skills: s.skills.join(", "),
     });
+
+    // ⭐ scroll to form
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   // ================= DELETE =================
   const del = (id) => {
     if (window.confirm("Delete this student?")) {
-      axios.delete(`${API}/students/${id}`)
-        .then(() => load());
+      axios.delete(`${API}/students/${id}`).then(() => load());
     }
   };
 
   // ================= FILTER =================
   const filteredStudents = deptFilter
-    ? students.filter(s => s.department === deptFilter)
+    ? students.filter((s) => s.department === deptFilter)
     : students;
 
   return (
@@ -196,20 +198,30 @@ export default function StudentManager() {
         <h1 style={styles.heading}>Student Manager</h1>
 
         {/* FORM */}
-        <div style={styles.formBox}>
-          <h3>{editId ? "Update Student" : "Add Student"}</h3>
+        <div ref={formRef} style={styles.formBox}>
+          <h3 style={{ color: "#fff" }}>
+            {editId ? "Update Student" : "Add Student"}
+          </h3>
 
-          <input style={styles.input} placeholder="Roll No"
+          <input
+            style={styles.input}
+            placeholder="Roll No"
             value={form.roll_no}
-            onChange={e => setForm({ ...form, roll_no: e.target.value })} />
+            onChange={(e) => setForm({ ...form, roll_no: e.target.value })}
+          />
 
-          <input style={styles.input} placeholder="Name"
+          <input
+            style={styles.input}
+            placeholder="Name"
             value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })} />
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
 
-          <select style={styles.select}
+          <select
+            style={styles.select}
             value={form.department}
-            onChange={e => setForm({ ...form, department: e.target.value })}>
+            onChange={(e) => setForm({ ...form, department: e.target.value })}
+          >
             <option value="">Select Department</option>
             <option value="CSE">CSE</option>
             <option value="IT">IT</option>
@@ -217,33 +229,58 @@ export default function StudentManager() {
             <option value="ME">ME</option>
           </select>
 
-          <input style={styles.input} placeholder="CGPA"
+          <input
+            style={styles.input}
+            placeholder="CGPA"
             value={form.cgpa}
-            onChange={e => setForm({ ...form, cgpa: e.target.value })} />
+            onChange={(e) => setForm({ ...form, cgpa: e.target.value })}
+          />
 
-          <input style={styles.input} placeholder="Coding Score"
+          <input
+            style={styles.input}
+            placeholder="Coding Score"
             value={form.coding_score}
-            onChange={e => setForm({ ...form, coding_score: e.target.value })} />
+            onChange={(e) => setForm({ ...form, coding_score: e.target.value })}
+          />
 
-          <input style={styles.input} placeholder="Aptitude Score"
+          <input
+            style={styles.input}
+            placeholder="Aptitude Score"
             value={form.aptitude_score}
-            onChange={e => setForm({ ...form, aptitude_score: e.target.value })} />
+            onChange={(e) =>
+              setForm({ ...form, aptitude_score: e.target.value })
+            }
+          />
 
-          <input style={styles.input} placeholder="Communication Score"
+          <input
+            style={styles.input}
+            placeholder="Communication Score"
             value={form.communication_score}
-            onChange={e => setForm({ ...form, communication_score: e.target.value })} />
+            onChange={(e) =>
+              setForm({ ...form, communication_score: e.target.value })
+            }
+          />
 
-          <input style={styles.input} placeholder="Internships"
+          <input
+            style={styles.input}
+            placeholder="Internships"
             value={form.internships}
-            onChange={e => setForm({ ...form, internships: e.target.value })} />
+            onChange={(e) => setForm({ ...form, internships: e.target.value })}
+          />
 
-          <input style={styles.input} placeholder="Projects"
+          <input
+            style={styles.input}
+            placeholder="Projects"
             value={form.projects}
-            onChange={e => setForm({ ...form, projects: e.target.value })} />
+            onChange={(e) => setForm({ ...form, projects: e.target.value })}
+          />
 
-          <input style={styles.input} placeholder="Skills (comma separated)"
+          <input
+            style={styles.input}
+            placeholder="Skills (comma separated)"
             value={form.skills}
-            onChange={e => setForm({ ...form, skills: e.target.value })} />
+            onChange={(e) => setForm({ ...form, skills: e.target.value })}
+          />
 
           <button style={styles.buttonPrimary} onClick={submit}>
             {editId ? "Update" : "Add"}
@@ -253,9 +290,11 @@ export default function StudentManager() {
         {/* FILTER */}
         <div style={{ marginBottom: 20 }}>
           <b>Filter by Department: </b>
-          <select style={{ ...styles.select, width: 200 }}
+          <select
+            style={{ ...styles.select, width: 200 }}
             value={deptFilter}
-            onChange={e => setDeptFilter(e.target.value)}>
+            onChange={(e) => setDeptFilter(e.target.value)}
+          >
             <option value="">All</option>
             <option value="CSE">CSE</option>
             <option value="IT">IT</option>
@@ -268,32 +307,54 @@ export default function StudentManager() {
         <h2>Students</h2>
 
         <div style={styles.grid}>
-          {filteredStudents.map(s => (
+          {filteredStudents.map((s) => (
             <div key={s._id} style={styles.card}>
-
               <h3 style={{ marginTop: 0 }}>{s.name || "-"}</h3>
-              <p><b>Roll No:</b> {s.roll_no || "-"}</p>
-              <p><b>Department:</b> {s.department || "-"}</p>
-              <p><b>CGPA:</b> {s.cgpa ?? "-"}</p>
-              <p><b>Coding:</b> {s.coding_score ?? "-"}</p>
-              <p><b>Aptitude:</b> {s.aptitude_score ?? "-"}</p>
-              <p><b>Communication:</b> {s.communication_score ?? "-"}</p>
-              <p><b>Internships:</b> {s.internships ?? "-"}</p>
-              <p><b>Projects:</b> {s.projects ?? "-"}</p>
-              <p><b>Skills:</b> {s.skills?.length ? s.skills.join(", ") : "-"}</p>
+              <p>
+                <b>Roll No:</b> {s.roll_no || "-"}
+              </p>
+              <p>
+                <b>Department:</b> {s.department || "-"}
+              </p>
+              <p>
+                <b>CGPA:</b> {s.cgpa ?? "-"}
+              </p>
+              <p>
+                <b>Coding:</b> {s.coding_score ?? "-"}
+              </p>
+              <p>
+                <b>Aptitude:</b> {s.aptitude_score ?? "-"}
+              </p>
+              <p>
+                <b>Communication:</b> {s.communication_score ?? "-"}
+              </p>
+              <p>
+                <b>Internships:</b> {s.internships ?? "-"}
+              </p>
+              <p>
+                <b>Projects:</b> {s.projects ?? "-"}
+              </p>
+              <p>
+                <b>Skills:</b> {s.skills?.length ? s.skills.join(", ") : "-"}
+              </p>
 
               <div style={{ marginTop: 12 }}>
-                <button style={styles.buttonEdit} onClick={() => editStudent(s)}>Edit</button>
-                <button style={styles.buttonDanger} onClick={() => del(s._id)}>Delete</button>
+                <button
+                  style={styles.buttonEdit}
+                  onClick={() => editStudent(s)}
+                >
+                  Edit
+                </button>
+                <button style={styles.buttonDanger} onClick={() => del(s._id)}>
+                  Delete
+                </button>
                 <a href={`/student/${s._id}`}>
                   <button style={styles.buttonView}>View</button>
                 </a>
               </div>
-
             </div>
           ))}
         </div>
-
       </div>
     </div>
   );

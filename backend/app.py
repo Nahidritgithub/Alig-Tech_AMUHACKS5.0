@@ -27,10 +27,10 @@ def add_student():
     data = request.json
 
     # -------- auto register skills --------
-    for skill in data.get("skills", []):
-        exists = db.skills.find_one({"name": skill})
-        if not exists:
-            db.skills.insert_one({"name": skill})
+    # for skill in data.get("skills", []):
+    #     exists = db.skills.find_one({"name": skill})
+    #     if not exists:
+    #         db.skills.insert_one({"name": skill})
 
     students.insert_one(data)
 
@@ -52,10 +52,10 @@ def update_student(id):
     data = request.json
 
     # auto add skills
-    for skill in data.get("skills", []):
-        exists = db.skills.find_one({"name": skill})
-        if not exists:
-            db.skills.insert_one({"name": skill})
+    # for skill in data.get("skills", []):
+    #     exists = db.skills.find_one({"name": skill})
+    #     if not exists:
+    #         db.skills.insert_one({"name": skill})
 
     students.update_one(
         {"_id": ObjectId(id)},
@@ -441,8 +441,10 @@ def company_readiness():
                 ok = False
 
             # skills
+            student_skills = {x.lower() for x in s["skills"]}
+
             for skill in c["skills"]:
-                if skill not in s["skills"]:
+                if skill.lower() not in student_skills:
                     gaps["skills"][skill] = gaps["skills"].get(skill, 0) + 1
                     ok = False
 

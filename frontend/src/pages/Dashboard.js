@@ -303,105 +303,137 @@ export default function Dashboard() {
             </BarChart>
           </div>
 
-          {/* FOCUS SECTION */}
-          {/* {focus && (
-            <div style={styles.card}>
-              <h2>Placement Cell Focus Recommendations</h2>
-
-              <div style={styles.grid}>
-                {focus.departments.map((d,i)=>(
-                  <div key={i} style={{
-                    background:"#0f172a",
-                    padding:15,
-                    borderRadius:10,
-                    border:"1px solid #334155"
-                  }}>
-                    <h4>{d.name}</h4>
-                    <p>Coding: {d.coding}</p>
-                    <p>Aptitude: {d.aptitude}</p>
-                    <p>CGPA: {d.cgpa}</p>
-
-                    {d.weak_skills.length > 0 && (
-                      <>
-                        <b>Skill Gaps:</b>
-                        <ul>
-                          {d.weak_skills.map((s,j)=><li key={j}>{s}</li>)}
-                        </ul>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )} */}
-
-          {/* ================================================= */}
           {/* FOCUS RECOMMENDATION ENGINE */}
           {/* ================================================= */}
           {focus && (
             <div style={styles.card}>
-              <h2>Placement Cell Focus Recommendations</h2>
+              <h2 style={{ marginBottom: 20 }}>
+                Placement Cell Focus Recommendations
+              </h2>
 
               {/* OVERALL CAMPUS */}
               <div
                 style={{
-                  background: "#0f172a",
-                  padding: 15,
-                  borderRadius: 10,
+                  background: "#0b1220",
+                  padding: 20,
+                  borderRadius: 12,
                   border: "1px solid #334155",
-                  marginBottom: 20,
+                  marginBottom: 25,
                 }}
               >
-                <h3>Overall Campus</h3>
+                <h3 style={{ marginTop: 0, marginBottom: 10 }}>
+                  Overall Campus
+                </h3>
 
-                <p>
-                  <b>Coding Avg:</b> {focus.overall.coding}
-                </p>
-                <p>
-                  <b>Aptitude Avg:</b> {focus.overall.aptitude}
-                </p>
-                <p>
-                  <b>CGPA Avg:</b> {focus.overall.cgpa}
-                </p>
+                <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+                  <p>
+                    <b>Coding Avg:</b> {focus.overall.coding}
+                  </p>
+                  <p>
+                    <b>Aptitude Avg:</b> {focus.overall.aptitude}
+                  </p>
+                  <p>
+                    <b>CGPA Avg:</b> {focus.overall.cgpa}
+                  </p>
+                </div>
 
-                {focus.overall.coding < 60 && <p>⚠ Increase coding contests</p>}
-                {focus.overall.aptitude < 60 && <p>⚠ Add aptitude training</p>}
-                {focus.overall.cgpa < 7 && <p>⚠ Academic mentoring required</p>}
+                <div style={{ marginTop: 12 }}>
+                  {focus.overall.coding < 60 && (
+                    <p style={{ color: "#f87171" }}>
+                      ⚠ Increase coding contests
+                    </p>
+                  )}
+                  {focus.overall.aptitude < 60 && (
+                    <p style={{ color: "#fbbf24" }}>⚠ Add aptitude training</p>
+                  )}
+                  {focus.overall.cgpa < 7 && (
+                    <p style={{ color: "#60a5fa" }}>
+                      ⚠ Academic mentoring required
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* DEPARTMENT WISE STRATEGY */}
-              <h3>Department Wise Strategy</h3>
+              <h3 style={{ marginBottom: 15 }}>Department Wise Strategy</h3>
 
               <div style={styles.grid}>
                 {focus.departments.map((d, i) => (
                   <div
                     key={i}
                     style={{
-                      background: "#0f172a",
-                      padding: 15,
-                      borderRadius: 10,
+                      background: "#0b1220",
+                      padding: 18,
+                      borderRadius: 12,
                       border: "1px solid #334155",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
                     }}
                   >
-                    <h4>{d.name}</h4>
+                    {/* <h4 style={{ marginTop: 0 }}>{d.name}</h4> */}
+                    <div
+                      style={{
+                        marginBottom: 12,
+                        padding: "6px 10px",
+                        background: "#1d4ed8",
+                        borderRadius: 8,
+                        display: "inline-block",
+                        fontWeight: "700",
+                        fontSize: 14,
+                        letterSpacing: 1,
+                      }}
+                    >
+                      {d.name}
+                    </div>
 
-                    <p>Coding: {d.coding}</p>
-                    <p>Aptitude: {d.aptitude}</p>
-                    <p>CGPA: {d.cgpa}</p>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>Coding</span>
+                      <b>{d.coding}</b>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>Aptitude</span>
+                      <b>{d.aptitude}</b>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>CGPA</span>
+                      <b>{d.cgpa}</b>
+                    </div>
 
-                    {d.coding < 60 && <p>⚠ Improve coding</p>}
-                    {d.aptitude < 60 && <p>⚠ Improve aptitude</p>}
-                    {d.cgpa < 7 && <p>⚠ Academic support</p>}
+                    <div style={{ marginTop: 10 }}>
+                      {d.coding < 60 && (
+                        <p style={{ color: "#f87171" }}>⚠ Improve coding</p>
+                      )}
+                      {d.aptitude < 60 && (
+                        <p style={{ color: "#fbbf24" }}>⚠ Improve aptitude</p>
+                      )}
+                      {d.cgpa < 7 && (
+                        <p style={{ color: "#60a5fa" }}>⚠ Academic support</p>
+                      )}
+                    </div>
 
                     {d.weak_skills?.length > 0 && (
-                      <>
+                      <div style={{ marginTop: 12 }}>
                         <b>Skill Gaps:</b>
-                        <ul>
+                        <ul style={{ paddingLeft: 18, marginTop: 6 }}>
                           {d.weak_skills.map((s, j) => (
                             <li key={j}>{s}</li>
                           ))}
                         </ul>
-                      </>
+                      </div>
                     )}
                   </div>
                 ))}

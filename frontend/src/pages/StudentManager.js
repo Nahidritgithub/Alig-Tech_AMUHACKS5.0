@@ -21,14 +21,100 @@ export default function StudentManager() {
   const [students, setStudents] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
+  const [deptFilter, setDeptFilter] = useState("");
 
-  const [deptFilter, setDeptFilter] = useState("");   // ⭐ filter
+  // ================= STYLES =================
+  const styles = {
+    page: {
+      padding: 20,
+      backgroundColor: "#0f172a",
+      minHeight: "100vh",
+      color: "#e2e8f0",
+      fontFamily: "'Poppins', sans-serif",
+  
+    },
+    heading: {
+      fontSize: "28px",
+      fontWeight: "700",
+      marginBottom: 20,
+      color: "#ffffff"
+    },
+    formBox: {
+      border: "1px solid #334155",
+      padding: 20,
+      marginBottom: 25,
+      borderRadius: 10,
+      background: "#1e293b",
+      itemAlign: "center",
+   
+    },
+    input: {
+      width: "100%",
+      padding: "8px 10px",
+      marginBottom: 10,
+      borderRadius: 6,
+      border: "1px solid #334155",
+      background: "#0f172a",
+      color: "#e2e8f0"
+    },
+    select: {
+      width: "100%",
+      padding: "8px 10px",
+      marginBottom: 10,
+      borderRadius: 6,
+      border: "1px solid #334155",
+      background: "#0f172a",
+      color: "#e2e8f0"
+    },
+    buttonPrimary: {
+      padding: "8px 16px",
+      background: "#2563eb",
+      color: "#fff",
+      border: "none",
+      borderRadius: 6,
+      cursor: "pointer",
+      fontWeight: "500"
+    },
+    buttonDanger: {
+      padding: "6px 12px",
+      background: "#dc2626",
+      color: "#fff",
+      border: "none",
+      borderRadius: 6,
+      cursor: "pointer",
+      marginLeft: 6
+    },
+    buttonEdit: {
+      padding: "6px 12px",
+      background: "#f59e0b",
+      color: "#fff",
+      border: "none",
+      borderRadius: 6,
+      cursor: "pointer"
+    },
+    buttonView: {
+      padding: "6px 12px",
+      background: "#10b981",
+      color: "#fff",
+      border: "none",
+      borderRadius: 6,
+      cursor: "pointer",
+      marginLeft: 6
+    },
+    card: {
+      border: "1px solid #334155",
+      padding: 15,
+      borderRadius: 10,
+      background: "#1e293b"
+    },
+    grid: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+      gap: 15
+    }
+  };
 
-
-
-  // =================================================
-  // LOAD
-  // =================================================
+  // ================= LOAD =================
   const load = () => {
     axios.get(`${API}/students`)
       .then(res => setStudents(res.data));
@@ -38,11 +124,7 @@ export default function StudentManager() {
     load();
   }, []);
 
-
-
-  // =================================================
-  // ADD / UPDATE
-  // =================================================
+  // ================= ADD / UPDATE =================
   const submit = () => {
 
     const payload = {
@@ -76,11 +158,7 @@ export default function StudentManager() {
     }
   };
 
-
-
-  // =================================================
-  // EDIT
-  // =================================================
+  // ================= EDIT =================
   const editStudent = (s) => {
     setEditId(s._id);
     setForm({
@@ -97,11 +175,7 @@ export default function StudentManager() {
     });
   };
 
-
-
-  // =================================================
-  // DELETE
-  // =================================================
+  // ================= DELETE =================
   const del = (id) => {
     if (window.confirm("Delete this student?")) {
       axios.delete(`${API}/students/${id}`)
@@ -109,100 +183,79 @@ export default function StudentManager() {
     }
   };
 
-
-
-  // =================================================
-  // APPLY DEPARTMENT FILTER
-  // =================================================
+  // ================= FILTER =================
   const filteredStudents = deptFilter
     ? students.filter(s => s.department === deptFilter)
     : students;
-
-
 
   return (
     <div>
       <Navbar />
 
-      <div style={{ padding: 20 }}>
-        <h1>Student Manager</h1>
+      <div style={styles.page}>
+        <h1 style={styles.heading}>Student Manager</h1>
 
-
-
-        {/* ================================================= */}
         {/* FORM */}
-        {/* ================================================= */}
-        <div style={{ border: "1px solid gray", padding: 15, marginBottom: 20 }}>
+        <div style={styles.formBox}>
           <h3>{editId ? "Update Student" : "Add Student"}</h3>
 
-          <input placeholder="Roll No"
+          <input style={styles.input} placeholder="Roll No"
             value={form.roll_no}
-            onChange={e => setForm({ ...form, roll_no: e.target.value })} /><br />
+            onChange={e => setForm({ ...form, roll_no: e.target.value })} />
 
-          <input placeholder="Name"
+          <input style={styles.input} placeholder="Name"
             value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })} /><br />
+            onChange={e => setForm({ ...form, name: e.target.value })} />
 
-
-          {/* ⭐ DROPDOWN */}
-          <select
+          <select style={styles.select}
             value={form.department}
-            onChange={e => setForm({ ...form, department: e.target.value })}
-          >
+            onChange={e => setForm({ ...form, department: e.target.value })}>
             <option value="">Select Department</option>
             <option value="CSE">CSE</option>
             <option value="IT">IT</option>
             <option value="ECE">ECE</option>
             <option value="ME">ME</option>
           </select>
-          <br />
 
-
-          <input placeholder="CGPA"
+          <input style={styles.input} placeholder="CGPA"
             value={form.cgpa}
-            onChange={e => setForm({ ...form, cgpa: e.target.value })} /><br />
+            onChange={e => setForm({ ...form, cgpa: e.target.value })} />
 
-          <input placeholder="Coding Score"
+          <input style={styles.input} placeholder="Coding Score"
             value={form.coding_score}
-            onChange={e => setForm({ ...form, coding_score: e.target.value })} /><br />
+            onChange={e => setForm({ ...form, coding_score: e.target.value })} />
 
-          <input placeholder="Aptitude Score"
+          <input style={styles.input} placeholder="Aptitude Score"
             value={form.aptitude_score}
-            onChange={e => setForm({ ...form, aptitude_score: e.target.value })} /><br />
+            onChange={e => setForm({ ...form, aptitude_score: e.target.value })} />
 
-          <input placeholder="Communication Score"
+          <input style={styles.input} placeholder="Communication Score"
             value={form.communication_score}
-            onChange={e => setForm({ ...form, communication_score: e.target.value })} /><br />
+            onChange={e => setForm({ ...form, communication_score: e.target.value })} />
 
-          <input placeholder="Internships"
+          <input style={styles.input} placeholder="Internships"
             value={form.internships}
-            onChange={e => setForm({ ...form, internships: e.target.value })} /><br />
+            onChange={e => setForm({ ...form, internships: e.target.value })} />
 
-          <input placeholder="Projects"
+          <input style={styles.input} placeholder="Projects"
             value={form.projects}
-            onChange={e => setForm({ ...form, projects: e.target.value })} /><br />
+            onChange={e => setForm({ ...form, projects: e.target.value })} />
 
-          <input placeholder="Skills (comma separated)"
+          <input style={styles.input} placeholder="Skills (comma separated)"
             value={form.skills}
-            onChange={e => setForm({ ...form, skills: e.target.value })} /><br />
+            onChange={e => setForm({ ...form, skills: e.target.value })} />
 
-          <button onClick={submit}>
+          <button style={styles.buttonPrimary} onClick={submit}>
             {editId ? "Update" : "Add"}
           </button>
         </div>
 
-
-
-        {/* ================================================= */}
         {/* FILTER */}
-        {/* ================================================= */}
-        <div style={{ marginBottom: 15 }}>
+        <div style={{ marginBottom: 20 }}>
           <b>Filter by Department: </b>
-
-          <select
+          <select style={{ ...styles.select, width: 200 }}
             value={deptFilter}
-            onChange={e => setDeptFilter(e.target.value)}
-          >
+            onChange={e => setDeptFilter(e.target.value)}>
             <option value="">All</option>
             <option value="CSE">CSE</option>
             <option value="IT">IT</option>
@@ -211,25 +264,12 @@ export default function StudentManager() {
           </select>
         </div>
 
-
-
-        {/* ================================================= */}
         {/* LIST */}
-        {/* ================================================= */}
         <h2>Students</h2>
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          gap: 15
-        }}>
+        <div style={styles.grid}>
           {filteredStudents.map(s => (
-            <div key={s._id} style={{
-              border: "1px solid #333",
-              padding: 12,
-              borderRadius: 8,
-              background: "#f8fafc"
-            }}>
+            <div key={s._id} style={styles.card}>
 
               <h3 style={{ marginTop: 0 }}>{s.name || "-"}</h3>
               <p><b>Roll No:</b> {s.roll_no || "-"}</p>
@@ -242,13 +282,11 @@ export default function StudentManager() {
               <p><b>Projects:</b> {s.projects ?? "-"}</p>
               <p><b>Skills:</b> {s.skills?.length ? s.skills.join(", ") : "-"}</p>
 
-              <div style={{ marginTop: 10 }}>
-                <button onClick={() => editStudent(s)}>Edit</button>
-                <button onClick={() => del(s._id)} style={{ marginLeft: 5 }}>
-                  Delete
-                </button>
+              <div style={{ marginTop: 12 }}>
+                <button style={styles.buttonEdit} onClick={() => editStudent(s)}>Edit</button>
+                <button style={styles.buttonDanger} onClick={() => del(s._id)}>Delete</button>
                 <a href={`/student/${s._id}`}>
-                  <button style={{ marginLeft: 5 }}>View</button>
+                  <button style={styles.buttonView}>View</button>
                 </a>
               </div>
 

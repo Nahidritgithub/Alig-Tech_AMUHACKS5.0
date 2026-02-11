@@ -17,33 +17,125 @@ export default function CompanyReadiness(){
       });
   },[name]);
 
-  if(!data) return <div>Loading...</div>;
+  if(!data) return <div style={{padding:30}}>Loading...</div>;
+
+  // ======================= STYLES =======================
+  const styles = {
+    page: {
+      minHeight: "100vh",
+      background: "#0f172a",
+      padding: 30,
+      color: "#e2e8f0",
+      fontFamily: "'Poppins', sans-serif"
+    },
+    container: {
+      maxWidth: 1100,
+      margin: "0 auto"
+    },
+    heading: {
+      textAlign: "center",
+      fontSize: 28,
+      fontWeight: "700",
+      marginBottom: 30
+    },
+    summaryGrid: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+      gap: 20,
+      marginBottom: 30
+    },
+    summaryCard: {
+      background: "linear-gradient(135deg, #1e3a8a, #1e293b)",
+      padding: 20,
+      borderRadius: 14,
+      border: "1px solid #334155",
+      textAlign: "center"
+    },
+    summaryNumber: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: "#93c5fd"
+    },
+    section: {
+      background: "#1e293b",
+      padding: 20,
+      borderRadius: 14,
+      border: "1px solid #334155",
+      marginBottom: 25
+    },
+    gapItem: {
+      marginBottom: 8,
+      color: "#fca5a5"
+    },
+    skillBox: {
+      background: "#0f172a",
+      padding: 10,
+      borderRadius: 8,
+      marginBottom: 8,
+      border: "1px solid #334155"
+    },
+    actionList: {
+      lineHeight: 1.8
+    }
+  };
 
   return(
     <div>
       <Navbar/>
-      <div style={{padding:20}}>
-        <h1>{data.company} Readiness</h1>
 
-        <h2>Eligibility</h2>
-        <p>Students eligible: {data.eligible}</p>
-        <p>Campus %: {data.percent}</p>
+      <div style={styles.page}>
+        <div style={styles.container}>
 
-        <h2>Main Gaps</h2>
-        <p>Below CGPA: {data.gaps.cgpa}</p>
-        <p>Below Coding: {data.gaps.coding}</p>
+          <h1 style={styles.heading}>
+            {data.company} Readiness Dashboard
+          </h1>
 
-        <h3>Missing Skills</h3>
-        {Object.entries(data.gaps.skills).map(([k,v])=>(
-          <p key={k}>{k} → {v}</p>
-        ))}
+          {/* ================= SUMMARY ================= */}
+          <div style={styles.summaryGrid}>
+            <div style={styles.summaryCard}>
+              <div style={styles.summaryNumber}>{data.eligible}</div>
+              <div>Students Eligible</div>
+            </div>
 
-        <h2>Recommended Action</h2>
-        <ul>
-          <li>Focus training on top missing skills</li>
-          <li>Improve coding preparation</li>
-          <li>Shortlist mentoring for near-eligible students</li>
-        </ul>
+            <div style={styles.summaryCard}>
+              <div style={styles.summaryNumber}>{data.percent}%</div>
+              <div>Campus Readiness</div>
+            </div>
+          </div>
+
+          {/* ================= MAIN GAPS ================= */}
+          <div style={styles.section}>
+            <h2>Main Gaps</h2>
+            <div style={styles.gapItem}>
+              Below CGPA: {data.gaps.cgpa}
+            </div>
+            <div style={styles.gapItem}>
+              Below Coding: {data.gaps.coding}
+            </div>
+          </div>
+
+          {/* ================= MISSING SKILLS ================= */}
+          <div style={styles.section}>
+            <h3>Top Missing Skills</h3>
+
+            {Object.entries(data.gaps.skills).map(([k,v])=>(
+              <div key={k} style={styles.skillBox}>
+                <b>{k}</b> → {v} students
+              </div>
+            ))}
+          </div>
+
+          {/* ================= RECOMMENDATION ================= */}
+          <div style={styles.section}>
+            <h2>Recommended Actions</h2>
+            <ul style={styles.actionList}>
+              <li>Focus training on top missing skills</li>
+              <li>Improve coding preparation sessions</li>
+              <li>Provide mentoring for near-eligible students</li>
+            </ul>
+          </div>
+
+        </div>
       </div>
     </div>
   );

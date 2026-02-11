@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-
-const API = "http://localhost:5000";
+import { API } from "../config/api";
 
 export default function SkillManager(){
 

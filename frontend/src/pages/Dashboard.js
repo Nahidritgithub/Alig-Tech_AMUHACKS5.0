@@ -6,15 +6,13 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip,
   CartesianGrid, LabelList
 } from "recharts";
-
-const API = "http://localhost:5000";
+import { API } from "../config/api";
 
 export default function Dashboard() {
 
   const navigate = useNavigate();
 
   const [distribution, setDistribution] = useState([]);
-  const [skillsChart, setSkillsChart] = useState([]);
   const [companyReadiness, setCompanyReadiness] = useState([]);
   const [focus, setFocus] = useState(null);
 
@@ -34,8 +32,6 @@ export default function Dashboard() {
   // LOAD INITIAL DATA
   // =================================================
   useEffect(() => {
-    axios.get(`${API}/dashboard/summary`)
-      .then(r => setSkillsChart(r.data.skills));
 
     axios.get(`${API}/dashboard/company-readiness`)
       .then(r => setCompanyReadiness(r.data));

@@ -6,15 +6,13 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip,
   CartesianGrid, LabelList
 } from "recharts";
-
-const API = "http://localhost:5000";
+import { API } from "../config/api";
 
 export default function Dashboard() {
 
   const navigate = useNavigate();
 
   const [distribution, setDistribution] = useState([]);
-  const [skillsChart, setSkillsChart] = useState([]);
   const [companyReadiness, setCompanyReadiness] = useState([]);
   const [focus, setFocus] = useState(null);
 
@@ -26,8 +24,6 @@ export default function Dashboard() {
   const [skillStats, setSkillStats] = useState(null);
 
   useEffect(() => {
-    axios.get(`${API}/dashboard/summary`)
-      .then(r => setSkillsChart(r.data.skills));
 
     axios.get(`${API}/dashboard/company-readiness`)
       .then(r => setCompanyReadiness(r.data));
@@ -38,6 +34,7 @@ export default function Dashboard() {
 
   const skillArray = search.split(",").map(s => s.trim()).filter(Boolean);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
 
     axios.get(`${API}/dashboard/skill-distribution`, {
@@ -60,7 +57,7 @@ export default function Dashboard() {
       setSkillStats(null);
     }
 
-  }, [search, minCgpa, minCoding, minAptitude, department]);
+  }, [skillArray.length, search, minCgpa, minCoding, minAptitude, department]);
 
   const getStatus = () => {
     if (!skillStats) return "";

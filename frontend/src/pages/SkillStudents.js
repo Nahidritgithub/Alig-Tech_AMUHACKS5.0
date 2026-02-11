@@ -2,8 +2,7 @@ import Navbar from "../components/Navbar";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-
-const API = "http://localhost:5000";
+import { API } from "../config/api";
 
 export default function SkillStudents() {
 
@@ -24,6 +23,7 @@ export default function SkillStudents() {
   // =================================================
   // LOAD + FILTER
   // =================================================
+
   useEffect(() => {
 
     axios.get(`${API}/students`)
@@ -55,7 +55,7 @@ export default function SkillStudents() {
         setStudents(filtered);
       });
 
-  }, [location.search]);
+  }, [location.search, skills, minCgpa, coding, aptitude, department]);
 
   // ======================= STYLES =======================
   const styles = {

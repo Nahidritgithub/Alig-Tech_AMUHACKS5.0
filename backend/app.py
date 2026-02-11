@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
 from bson import ObjectId
-from model import load_model
 from readiness import readiness
 from predictor import predict, analyze_gaps
 
@@ -14,8 +13,6 @@ db = client["cpris"]
 
 students = db.students
 companies = db.companies
-
-model = load_model()
 
 
 # ---------------- HOME ----------------
@@ -618,6 +615,10 @@ def predict_student(student_id):
         })
 
     return jsonify(output)
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 

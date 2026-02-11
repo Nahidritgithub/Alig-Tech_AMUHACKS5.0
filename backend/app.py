@@ -23,11 +23,20 @@ def home():
     return "CPRIS Running 🚀"
 
 
-# ---------------- ADD STUDENT ----------------
+# ---------------- ADD STUDENT ---------------
 @app.route("/students", methods=["POST"])
 def add_student():
-    students.insert_one(request.json)
-    return jsonify({"msg": "added"})
+    data = request.json
+
+    # -------- auto register skills --------
+    for skill in data.get("skills", []):
+        exists = db.skills.find_one({"name": skill})
+        if not exists:
+            db.skills.insert_one({"name": skill})
+
+    students.insert_one(data)
+
+    return jsonify({"msg": "student added"})
 
 
 # ---------------- GET STUDENTS ----------------
@@ -39,9 +48,16 @@ def get_students():
         out.append(s)
     return jsonify(out)
 
+# ---------------- UPDATE STUDENT ----------------
 @app.route("/students/<id>", methods=["PUT"])
 def update_student(id):
     data = request.json
+
+    # auto add skills
+    for skill in data.get("skills", []):
+        exists = db.skills.find_one({"name": skill})
+        if not exists:
+            db.skills.insert_one({"name": skill})
 
     students.update_one(
         {"_id": ObjectId(id)},
@@ -189,6 +205,105 @@ def dashboard_summary():
         "companies": company_stats
     })
 
+@app.route("/skills", methods=["POST"])
+def add_skill():
+    res = db.skills.insert_one(request.json)
+    return jsonify({"msg": "skill added", "id": str(res.inserted_id)})
+
+
+@app.route("/skills", methods=["GET"])
+def get_skills():
+    out = []
+    for s in db.skills.find():
+        s["_id"] = str(s["_id"])
+        out.append(s)
+    return jsonify(out)
+
+
+@app.route("/skills/<id>", methods=["PUT"])
+def update_skill(id):
+    db.skills.update_one(
+        {"_id": ObjectId(id)},
+        {"$set": request.json}
+    )
+    return jsonify({"msg": "updated"})
+
+
+@app.route("/skills/<id>", methods=["DELETE"])
+def delete_skill(id):
+    db.skills.delete_one({"_id": ObjectId(id)})
+    return jsonify({"msg": "deleted"})
+
+@app.route("/dashboard/skill/<skill>")
+def skill_dashboard(skill):
+
+    total_students = students.count_documents({})
+    have_skill = students.count_documents({"skills": skill})
+
+    total_companies = companies.count_documents({})
+    company_need = companies.count_documents({"skills": skill})
+
+    return jsonify({
+        "skill": skill,
+        "students_percent": round((have_skill/total_students)*100,2) if total_students else 0,
+        "companies_need": company_need,
+        "total_companies": total_companies
+    })
+
+@app.route("/dashboard/skills")
+def multi_skill_dashboard():
+
+    skills = request.args.get("skills")  # "DSA,React"
+
+    if not skills:
+        return jsonify({})
+
+    skills = [s.strip() for s in skills.split(",")]
+
+    total_students = students.count_documents({})
+
+    # students having ANY skill
+    matched_students = list(students.find({
+        "skills": {"$in": skills}
+    }))
+
+    for s in matched_students:
+        s["_id"] = str(s["_id"])
+
+    count = len(matched_students)
+    percent = round((count / total_students) * 100, 2) if total_students else 0
+
+    # companies requiring ANY skill
+    company_need = companies.count_documents({
+        "skills": {"$in": skills}
+    })
+
+    return jsonify({
+        "skills": skills,
+        "students_count": count,
+        "students_percent": percent,
+        "companies_need": company_need,
+        "students": matched_students
+    })
+
+
+@app.route("/dashboard/skill-distribution")
+def skill_distribution():
+
+    total = students.count_documents({})
+    result = []
+
+    for sk in db.skills.find():
+        name = sk["name"]
+        count = students.count_documents({"skills": name})
+
+        result.append({
+            "skill": name,
+            "count": count,
+            "percent": round((count/total)*100,2) if total else 0
+        })
+
+    return jsonify(result)
 
 
 if __name__ == "__main__":
